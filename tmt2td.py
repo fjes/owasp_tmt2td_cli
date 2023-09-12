@@ -5,8 +5,18 @@
 import xml.etree.ElementTree as ET
 import os
 import json
-import tkinter as tk
-from tkinter import filedialog
+
+import argparse
+
+climode = False
+
+try:
+    import tkinter as tk
+    from tkinter import filedialog
+except ImportError:
+    print("Warning, no tkinter available - CLI mode activated")
+    climode = True
+    pass
 
 # namespace for prop elements
 ele_namespace = {'b': 'http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase'}
@@ -391,6 +401,11 @@ def main():
         quit()
 
     root.destroy()
+
+    main_parsing(file_path)
+
+
+def main_parsing(file_path):
     tree = ET.parse(file_path)
     root = tree.getroot()
 
@@ -456,6 +471,15 @@ def main():
         json.dump(model, outfile, indent=2, sort_keys=False)
 
 
-if __name__ == '__main__':
-   main()
+def main_cli():
+    parser = argparse.ArgumentParser(prog='', description='Convert M$ Thread model to Dragon')
+    parser.add_argument('mstmfile')
+    args = parser.parse_args()
+    main_parsing(args.mstmfile)
 
+
+if __name__ == '__main__':
+    if climode:
+        main_cli()
+    else:
+        main()
